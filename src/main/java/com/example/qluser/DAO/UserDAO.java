@@ -12,10 +12,12 @@ public class UserDAO implements IUserDAO{
     private String jdbcPassword = "Phua11@pxa";
 
     private static final String INSERT_USERS_SQL = "INSERT INTO users (name, email, country) VALUES (?, ?, ?);";
-    private static final String SELECT_USER_BY_ID = "select id,name,email,country from users where id =?";
-    private static final String SELECT_ALL_USERS = "select * from users";
+    private static final String SELECT_USER_BY_ID = "select id,name,email,country from users where id =?;";
+//    private static final String SELECT_ALL_USERS = "select * from users";
     private static final String DELETE_USERS_SQL = "delete from users where id = ?;";
     private static final String UPDATE_USERS_SQL = "update users set name = ?,email= ?, country =? where id = ?;";
+    private static final String SELECT_USER_BY_COUNTRY = "select id,name,email,country from users where country = ?;";
+    private static final String ORDER_BY_NAME = "select * from users order by name ASC;";
 
     public UserDAO() {
     }
@@ -33,6 +35,7 @@ public class UserDAO implements IUserDAO{
         return connection;
     }
 
+
     public void insertUser(User user) throws SQLException {
         System.out.println(INSERT_USERS_SQL);
         try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement(INSERT_USERS_SQL)) {
@@ -44,6 +47,31 @@ public class UserDAO implements IUserDAO{
         } catch (SQLException e) {
             printSQLException(e);
         }
+    }
+
+    public List<User> selectUserByCountry(String country){
+        List<User> users = new ArrayList<>();
+        try (Connection connection = getConnection();
+
+             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_USER_BY_COUNTRY);) {
+            preparedStatement.setString(1, country);
+            System.out.println(preparedStatement);
+            ResultSet rs = preparedStatement.executeQuery();
+
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                String email = rs.getString("email");
+                String countryName = rs.getString("country");
+
+                // Tạo đối tượng User và thêm vào danh sách
+                User user = new User(id, name, email, countryName);
+                users.add(user);
+            }
+        } catch (SQLException e) {
+            printSQLException(e);
+        }
+        return users;
     }
 
     public User selectUser(int id) {
@@ -71,7 +99,7 @@ public class UserDAO implements IUserDAO{
         List<User> users = new ArrayList<>();
         try (Connection connection = getConnection();
 
-             PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL_USERS);) {
+             PreparedStatement preparedStatement = connection.prepareStatement(ORDER_BY_NAME);) {
             System.out.println(preparedStatement);
             ResultSet rs = preparedStatement.executeQuery();
 

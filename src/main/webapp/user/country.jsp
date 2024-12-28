@@ -1,10 +1,10 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <title>User Management Application</title>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8">
+    <title>Kết quả tìm kiếm User theo Country</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -38,67 +38,71 @@
         .actions a {
             margin-right: 8px;
             text-decoration: none;
-            color: #007bff; /* xanh */
+            color: #007bff;
         }
         .actions a:hover {
             text-decoration: underline;
         }
-        .add-new-user {
+        .return-link {
             display: inline-block;
-            margin-top: 10px;
             text-decoration: none;
             padding: 6px 12px;
             background-color: #007bff;
             color: #ffffff;
             border-radius: 4px;
+            margin-bottom: 10px;
         }
-        .add-new-user:hover {
+        .return-link:hover {
             background-color: #0056b3;
         }
     </style>
 </head>
 <body>
-<h1>User Management</h1>
 
-<!-- Nút Thêm Mới Người Dùng -->
+<h1>Kết quả tìm kiếm User theo Country</h1>
+
+<!-- Nút quay về danh sách (tuỳ chỉnh theo URL mà bạn muốn) -->
 <div style="text-align: center;">
-    <a class="add-new-user" href="/users?action=create">Add New User</a>
-    <br>
-    <form action="/users?action=find" method="post">
-        <input type="text" name="country" id="country" placeholder="Country here !" >
-        <input type="submit" value="Find User">
-    </form>
+    <a class="return-link" href="/users">Return to Main List</a>
 </div>
 
 <div class="table-container">
     <table>
-        <caption>List of Users</caption>
+        <caption>Danh sách User</caption>
         <thead>
         <tr>
             <th>ID</th>
             <th>Name</th>
             <th>Email</th>
             <th>Country</th>
-            <th>Actions</th>
         </tr>
         </thead>
         <tbody>
-        <c:forEach var="user" items="${listUser}">
-            <tr>
-                <td><c:out value="${user.id}" /></td>
-                <td><c:out value="${user.name}" /></td>
-                <td><c:out value="${user.email}" /></td>
-                <td><c:out value="${user.country}" /></td>
-                <td class="actions">
-                    <a href="/users?action=edit&id=${user.id}">Edit</a>
-                    <a href="/users?action=delete&id=${user.id}">Delete</a>
-                </td>
-            </tr>
-        </c:forEach>
+        <!-- Sử dụng c:choose để hiển thị thông báo nếu rỗng -->
+        <c:choose>
+            <c:when test="${empty findUser}">
+                <!-- Nếu không có user nào khớp, hiển thị 1 dòng -->
+                <tr>
+                    <td colspan="4" style="text-align: center;">
+                        Không tìm thấy user cho country này!
+                    </td>
+                </tr>
+            </c:when>
+            <c:otherwise>
+                <!-- Nếu có user, lặp qua danh sách -->
+                <c:forEach var="user" items="${findUser}">
+                    <tr>
+                        <td><c:out value="${user.id}" /></td>
+                        <td><c:out value="${user.name}" /></td>
+                        <td><c:out value="${user.email}" /></td>
+                        <td><c:out value="${user.country}" /></td>
+                    </tr>
+                </c:forEach>
+            </c:otherwise>
+        </c:choose>
         </tbody>
     </table>
 </div>
-
 
 </body>
 </html>
